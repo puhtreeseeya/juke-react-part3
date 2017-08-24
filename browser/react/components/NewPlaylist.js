@@ -1,11 +1,12 @@
 import React, { Component } from 'react'; 
+import axios from 'axios';
 
 export default class NewPlaylist extends Component {
 
   constructor () {
     super();
     this.state = {
-      input: '', 
+      name: '', 
       isDisabled: true,
       hasEdit: false 
     };
@@ -15,9 +16,17 @@ export default class NewPlaylist extends Component {
 
   }
 
+  postToDatabase(name) {
+    axios.post('/api/playlists/', {name: name})
+    .then(res => res.data)
+    .then(playlists => {
+      console.log(playlists); 
+    })
+  }
+
   validate() {
     // console.log(this.state.isDisabled, "DFSD", this.state.hasEdit); 
-    if(this.state.input === '' || this.state.input.length > 16) {
+    if(this.state.name === '' || this.state.name.length > 16) {
       this.setState({
         isDisabled: true, 
         hasEdit: true 
@@ -32,15 +41,16 @@ export default class NewPlaylist extends Component {
 
   handleChange(event) {  
     this.setState({
-      input: event.target.value,  
+      name: event.target.value,  
     }, () => {
       this.validate(); 
     }); 
   }
 
   handleSubmit(event) {
+    this.postToDatabase(this.state.name); 
     this.setState({
-      input: ''
+      name: ''
     })
     event.preventDefault(); 
   }
@@ -55,7 +65,7 @@ export default class NewPlaylist extends Component {
                 <label className="col-xs-2 control-label">Name</label>
                 <div className="col-xs-10">
                   { (this.state.isDisabled && this.state.hasEdit) ? <div className="alert alert-warning">Please enter a playlist name</div> : null }
-                  <input className="form-control" type="text" value={this.state.input} onChange={this.handleChange} />
+                  <input className="form-control" type="text" value={this.state.name} onChange={this.handleChange} />
                 </div>
               </div>
               <div className="form-group">
